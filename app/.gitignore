@@ -11,7 +11,7 @@
 /storage/framework/*
 /storage/logs/*
 /storage/debugbar/*
-/bootstrap
+/bootstrap/*
 
 # Laravel 設定ファイル（環境ごとに異なるため）
 .env
