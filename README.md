@@ -126,10 +126,9 @@ git clone https://github.com/JinguuTukasa/Gizhub
 cd Gizhub
 ```
 
-### 2️⃣ `.env` ファイルの作成 & Laravel アプリキーの生成
+### 2️⃣ `.env` ファイルの作成
 ```sh
 cp .env.example .env
-docker-compose exec app php artisan key:generate
 ```
 
 ### 3️⃣ Docker コンテナの起動
@@ -144,6 +143,7 @@ docker-compose exec app php artisan migrate --seed
 docker-compose exec app php artisan config:clear
 docker-compose exec app php artisan cache:clear
 docker-compose exec app php artisan config:cache
+docker-compose exec app php artisan key:generate
 ```
 
 ### 5️⃣ フロントエンドのセットアップ
