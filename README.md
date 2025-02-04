@@ -122,7 +122,7 @@ volumes:
 
 ### 1️⃣ リポジトリをクローン
 ```sh
-git clone https://github.com/your-username/Gizhub.git
+git clone https://github.com/JinguuTukasa/Gizhub
 cd Gizhub
 ```
 
