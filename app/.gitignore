@@ -1,5 +1,7 @@
-/.phpunit.cache
+# Laravel キャッシュやフレームワークファイル
+/vendor
 /node_modules
+/.phpunit.cache
 /public/build
 /public/hot
 /public/storage
@@ -9,28 +11,38 @@
 /storage/framework/*
 /storage/logs/*
 /storage/debugbar/*
-/vendor
+/bootstrap
+
+# Laravel 設定ファイル（環境ごとに異なるため）
 .env
 .env.backup
 .env.production
+
+# PHPUnit キャッシュ
 .phpactor.json
 .phpunit.result.cache
+
+# Homestead & Vagrant 関連
 Homestead.json
 Homestead.yaml
+
+# npm / yarn エラーやデバッグログ
 npm-debug.log
 yarn-error.log
+
+# 認証情報
 /auth.json
+
+# 開発ツール関連
 /.fleet
 /.idea
 /.nova
 /.vscode
 /.zed
 
-# Node.js cache
+# Node.js のキャッシュ関連
 .parcel-cache/
 .turbo/
 
-# Docker関連 (必要なら)
-docker-compose.override.yml
-docker-compose.yml
-/.docker/
+# Laravel の `bootstrap/cache` のみ除外（`bootstrap/`は含める）
+/bootstrap/cache/
