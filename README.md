@@ -49,12 +49,21 @@ GizHub/
    # 必要に応じて.envを編集
    ```
 
-3. **Dockerコンテナを起動**
+3. **（重要）storage配下のディレクトリ作成＆権限修正**
+   新規クローン時や初回セットアップ時は、下記コマンドでstorage配下のディレクトリを作成し、権限を修正してください。
+   ```sh
+   docker-compose exec app mkdir -p storage/framework/views
+   docker-compose exec app chmod -R 777 storage
+   # または
+   # docker-compose exec app chown -R www-data:www-data storage
+   ```
+
+4. **Dockerコンテナを起動**
    ```sh
    docker-compose up -d --build
    ```
 
-4. **Laravelセットアップ**
+5. **Laravelセットアップ**
    ```sh
    docker-compose exec app composer install
    docker-compose exec app php artisan migrate --seed
@@ -64,13 +73,13 @@ GizHub/
    docker-compose exec app php artisan key:generate
    ```
 
-5. **フロントエンドセットアップ**
+6. **フロントエンドセットアップ**
    ```sh
    docker-compose exec frontend npm install
    docker-compose exec frontend npm run dev
    ```
 
-6. **Laravel Echo Server 起動**
+7. **Laravel Echo Server 起動**
    ```sh
    docker-compose exec echo-server laravel-echo-server start
    ```
@@ -131,6 +140,9 @@ VIEW_COMPILED_PATH=/var/www/html/storage/framework/views
   - → 他のサービスが同じポートを使っていないか確認してください。
 - **Q. DB接続エラー**
   - → `.env` のDB設定と `docker-compose.yml` の値が一致しているか確認。
+- **Q. 「Please provide a valid cache path.」というエラーが出る**
+  - → `storage/framework/views` ディレクトリが存在しない、または権限不足が原因です。
+  - 上記セットアップ手順3のコマンドを実行してください。
 
 ---
 
