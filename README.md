@@ -1,169 +1,87 @@
-# GizHub Environment Setup
+# GizHub 開発環境セットアップガイド
 
-この README は、GizHub の開発環境（Laravel + React + Laravel Echo Server + Redis + MySQL + Nginx + Coturn）のセットアップ方法と構成をまとめたものです。
-
----
-
-## 1. 環境構成
-
-| コンポーネント              | 役割                                      | バージョン            |
-| --------------------------- | ----------------------------------------- | --------------------- |
-| **Laravel (PHP)**           | バックエンド（API）                       | Laravel 11.9 (例)     |
-| **React (Vite)**            | フロントエンド                           | React 18 + Vite       |
-| **MySQL**                   | データベース                             | MySQL 8               |
-| **Redis**                   | キャッシュ & WebSocket 用                 | Redis 7               |
-| **Laravel Echo Server**     | WebSocket のサーバー                     | laravel-echo-server 1.6.3 |
-| **Nginx**                   | リバースプロキシ                         | Nginx latest          |
-| **Coturn**                  | STUN/TURN サーバー（WebRTC）               | instrumentisto/coturn |
+このリポジトリは、**Laravel + React + Laravel Echo Server + Redis + MySQL + Nginx + Coturn** をDockerで統合した、リアルタイムチャット等の開発用フルスタック環境です。
 
 ---
 
-## 2. Docker Compose 設定
+## 📦 構成概要
 
-以下は、`docker-compose.yml` の例です。 
-このファイルをプロジェクトのルートに保存してください。
+- **Laravel (PHP)** : バックエンドAPI
+- **React (Vite)** : フロントエンドSPA
+- **MySQL** : データベース
+- **Redis** : キャッシュ & WebSocket用
+- **Laravel Echo Server** : WebSocketサーバー
+- **Nginx** : リバースプロキシ
+- **Coturn** : STUN/TURNサーバー（WebRTC用）
 
-```yaml
-services:
-  app:
-    container_name: laravel_app
-    build:
-      context: ./app
-      dockerfile: Dockerfile
-    volumes:
-      - ./app:/var/www/html
-      - ./storage:/var/www/html/storage
-      - ./bootstrap/cache:/var/www/html/bootstrap/cache
-    depends_on:
-      - db
-      - redis
-    networks:
-      - app_network
+各サービスはDocker Composeで一括起動・停止できます。
 
-  db:
-    container_name: mysql_db
-    image: mysql:8
-    environment:
-      MYSQL_DATABASE: chat_db
-      MYSQL_USER: chat_user
-      MYSQL_PASSWORD: secret
-      MYSQL_ROOT_PASSWORD: root_password
-    volumes:
-      - mysql_data:/var/lib/mysql
-    ports:
-      - "3306:3306"
-    networks:
-      - app_network
+---
 
-  redis:
-    container_name: redis_server
-    image: redis:7
-    networks:
-      - app_network
+## 🗂️ ディレクトリ構成（抜粋）
 
-  echo-server:
-    container_name: laravel_echo_server
-    build:
-      context: ./echo-server
-      dockerfile: Dockerfile
-    ports:
-      - "6001:6001"
-    depends_on:
-      - redis
-    networks:
-      - app_network
-
-  frontend:
-    container_name: react_frontend
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/usr/src/app
-    networks:
-      - app_network
-
-  nginx:
-    container_name: nginx_server
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    ports:
-      - "80:80"
-    depends_on:
-      - app
-      - frontend
-    networks:
-      - app_network
-
-  coturn:
-    container_name: coturn_server
-    image: instrumentisto/coturn
-    ports:
-      - "3478:3478/tcp"
-      - "3478:3478/udp"
-      - "5349:5349/tcp"
-      - "5349:5349/udp"
-    networks:
-      - app_network
-
-networks:
-  app_network:
-
-volumes:
-  mysql_data:
+```
+GizHub/
+├── app/           # Laravel本体
+├── frontend/      # Reactフロントエンド
+├── db/            # MySQL用Dockerfile等
+├── redis/         # Redis用Dockerfile等
+├── echo-server/   # Laravel Echo Server
+├── nginx/         # Nginx設定
+├── coturn/        # Coturn設定
+├── docker-compose.yml
+└── README.md
 ```
 
 ---
 
-## 3. セットアップ手順
+## 🚀 セットアップ手順
 
-### 1️⃣ リポジトリをクローン
-```sh
-git clone https://github.com/JinguuTukasa/Gizhub
-cd Gizhub
-```
+1. **リポジトリをクローン**
+   ```sh
+   git clone https://github.com/JinguuTukasa/Gizhub
+   cd Gizhub
+   ```
 
-### 2️⃣ `.env` ファイルの作成
-```sh
-cp .env.example .env
-```
+2. **.envファイルを作成**
+   ```sh
+   cp .env.example .env
+   # 必要に応じて.envを編集
+   ```
 
-### 3️⃣ Docker コンテナの起動
-```sh
-docker-compose up -d --build
-```
+3. **Dockerコンテナを起動**
+   ```sh
+   docker-compose up -d --build
+   ```
 
-### 4️⃣ Laravel のセットアップ
-```sh
-docker-compose exec app composer install
-docker-compose exec app php artisan migrate --seed
-docker-compose exec app php artisan config:clear
-docker-compose exec app php artisan cache:clear
-docker-compose exec app php artisan config:cache
-docker-compose exec app php artisan key:generate
-```
+4. **Laravelセットアップ**
+   ```sh
+   docker-compose exec app composer install
+   docker-compose exec app php artisan migrate --seed
+   docker-compose exec app php artisan config:clear
+   docker-compose exec app php artisan cache:clear
+   docker-compose exec app php artisan config:cache
+   docker-compose exec app php artisan key:generate
+   ```
 
-### 5️⃣ フロントエンドのセットアップ
-```sh
-docker-compose exec frontend npm install
-docker-compose exec frontend npm run dev
-```
+5. **フロントエンドセットアップ**
+   ```sh
+   docker-compose exec frontend npm install
+   docker-compose exec frontend npm run dev
+   ```
 
-### 6️⃣ Laravel Echo Server の起動
-```sh
-docker-compose exec echo-server laravel-echo-server start
-```
+6. **Laravel Echo Server 起動**
+   ```sh
+   docker-compose exec echo-server laravel-echo-server start
+   ```
 
 ---
 
-## 4. `.env` ファイル設定例
+## ⚙️ .env 設定例
 
-以下の内容を `.env` に記述してください。
+`.env.example` を参考に、必要な値を設定してください。
 
-```ini
+```
 APP_NAME=GizHub
 APP_ENV=local
 APP_KEY=base64:xxxxxxxxxxxxxxxxxxx
@@ -191,18 +109,33 @@ VIEW_COMPILED_PATH=/var/www/html/storage/framework/views
 
 ---
 
-## 5. 環境動作確認チェックリスト
+## ✅ 動作確認チェックリスト
 
-| チェック項目 | コマンド | 期待される結果 |
-|------------|------------|------------|
-| **Docker コンテナの確認** | `docker-compose ps` | すべてのコンテナが `Up` |
-| **MySQL 接続確認** | `docker-compose exec db mysql -u chat_user -psecret chat_db` | `mysql>` が表示される |
-| **Laravel の DB 接続確認** | `docker-compose exec app php artisan migrate:status` | マイグレーション一覧が表示される |
-| **Redis 接続確認** | `docker-compose exec redis redis-cli ping` | `PONG` が返る |
-| **Laravel Echo Server 確認** | `docker-compose logs echo-server` | `Server ready!` が表示される |
-| **フロントエンド表示確認** | [http://localhost:5173](http://localhost:5173) | フロントエンドが表示される |
-| **Nginx 経由でのバックエンド確認** | [http://localhost](http://localhost) | Laravel の画面が表示される |
+| 項目 | コマンド | 期待される結果 |
+|------|----------|----------------|
+| Dockerコンテナ | `docker-compose ps` | すべてUp |
+| MySQL接続 | `docker-compose exec db mysql -u chat_user -psecret chat_db` | `mysql>`表示 |
+| Laravel DB接続 | `docker-compose exec app php artisan migrate:status` | マイグレーション一覧 |
+| Redis接続 | `docker-compose exec redis redis-cli ping` | `PONG` |
+| Echo Server | `docker-compose logs echo-server` | `Server ready!` |
+| フロント表示 | [http://localhost:5173](http://localhost:5173) | SPA表示 |
+| Nginx経由 | [http://localhost](http://localhost) | Laravel画面 |
 
 ---
 
-この手順に従えば、どの PC でも環境をすぐにセットアップでき、開発を開始できます！ 🚀
+## 💡 よくある質問・トラブルシュート
+
+- **Q. .envファイルが無い/エラーになる**
+  - → `.env.example` をコピーして `.env` を作成してください。
+- **Q. ポート競合で起動できない**
+  - → 他のサービスが同じポートを使っていないか確認してください。
+- **Q. DB接続エラー**
+  - → `.env` のDB設定と `docker-compose.yml` の値が一致しているか確認。
+
+---
+
+## 📝 補足
+
+- **.gitignore** で `node_modules/` や `storage/` などは除外済みです。
+- **初回セットアップ後は、READMEの手順通りに進めればOKです。**
+- **不明点やトラブルはこのREADMEを見直してください。**
