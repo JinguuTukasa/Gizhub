@@ -39,8 +39,8 @@ services:
       context: ./db
       dockerfile: Dockerfile
     environment:
-      MYSQL_DATABASE: db
-      MYSQL_USER: user
+      MYSQL_DATABASE: chat_db
+      MYSQL_USER: chat_user
       MYSQL_PASSWORD: secret
       MYSQL_ROOT_PASSWORD: root_password
     volumes:

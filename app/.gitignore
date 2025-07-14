@@ -5,13 +5,12 @@
 /public/build
 /public/hot
 /public/storage
-/storage/*.key
-/storage/oauth-private.key
-/storage/oauth-public.key
-/storage/framework/*
-/storage/logs/*
-/storage/debugbar/*
-/bootstrap/*
+
+# storageディレクトリ全体を除外
+/storage/
+
+# Macの隠しファイルを除外
+*.DS_Store
 
 # Laravel 設定ファイル（環境ごとに異なるため）
 .env
@@ -44,5 +43,5 @@ yarn-error.log
 .parcel-cache/
 .turbo/
 
-# Laravel の `bootstrap/cache` のみ除外（`bootstrap/`は含める）
+# Laravel の `bootstrap/cache` のみ除外（`bootstrap/`は含めない）
 /bootstrap/cache/
