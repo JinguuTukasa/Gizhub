@@ -40,7 +40,7 @@ env: ## .env が無ければ .env.example から作成
 	fi
 
 up: ## コンテナをビルドして起動（バックグラウンド）+ フロントエンド開発サーバー起動
-	$(DC) up -d --build
+	$(DC) up -d
 	@echo ""
 	@echo "=== フロントエンド開発サーバー起動 ==="
 	@echo "フロントエンド開発サーバーを起動します..."
@@ -53,13 +53,23 @@ up: ## コンテナをビルドして起動（バックグラウンド）+ フ�
 	$(DC) exec $(FE) npm run dev
 
 up-bg: ## コンテナをビルドして起動（バックグラウンド）+ フロントエンド開発サーバーもバックグラウンド起動
-	$(DC) up -d --build
+	$(DC) up -d
 	@echo ""
 	@echo "=== フロントエンド開発サーバー起動（バックグラウンド） ==="
 	@echo "フロントエンド開発サーバーをバックグラウンドで起動します..."
 	@echo "ログは 'make echo-logs' で確認できます"
 	@echo ""
 	$(DC) exec -d $(FE) npm run dev
+
+stop: ## コンテナとフロントエンド開発サーバーを停止
+	@echo ""
+	@echo "=== フロントエンド開発サーバー停止 ==="
+	@echo "停止中..."
+	@echo ""
+	-$(DC) exec $(FE) pkill -f "vite" || true
+	$(DC) stop
+	@echo ""
+	@echo "✅ 全てのサービスを停止しました"
 
 build: ## コンテナをキャッシュ無しでビルド
 	$(DC) build --no-cache
