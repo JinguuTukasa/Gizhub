@@ -33,7 +33,6 @@ RUN mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
 # 権限の設定
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # コンテナ内で PHP-FPM がリッスンするポート（※通常は内部ポートとして使用）
 EXPOSE 9000
